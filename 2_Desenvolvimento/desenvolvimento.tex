@@ -1,0 +1,215 @@
+\section{METHODOLOGY}
+
+The first step was to define mathematical models of the prototype vehicle DT1 and the track. 
+A formulation was then proposed for the optimal control problem (OCP) to find the optimal driving strategy and gear ratio. 
+Accordingly, this proposed OPC was solved utilizing MATLAB and the FALCON.m library.
+
+\subsection{Modeling of vehicle dynamics}
+
+A simple model of the vehicle's dynamics was used. 
+Only the longitudinal dynamics was modeled. Aerodynamic drag did not consider wind effect. 
+Tire rolling resistance was independent of temperature, pressure, or speed. 
+Bearing friction was zero. The battery and power converter were treated as ideal. 
+The dynamics of the inductor in the motor were disregarded. 
+A white-box model was derived by using the fundamental principles that describe the system's behaviour. 
+The following equation that describes the longitudinal dynamics was derived from the application of Newton’s second law in the vehicle, as represented in Fig.~\ref{fig:diag_forcas_veiculo}. 
+
+\begin{equation} \label{eq:modelo_1}
+	\begin{split}
+		\left( m_v + m_p + m_r \right) \ddot x(t) = F_t - (F_a + F_g + F_r) \enspace,\\ 
+		m_r = \frac{N_r \cdot J_r + J_m\cdot \varphi^2 }{r_r^2} \enspace,\\ 
+		F_{t} =  K_t \cdot i(t) \cdot \eta \cdot \frac{\varphi}{r_r} \enspace,\\
+        F_{a} = \frac{\rho \cdot a_f \cdot c_d \cdot {\dot x(t)}^2}{2} \enspace,\\
+        F_{g} = (m_v + m_p) \cdot g \cdot \sin(\theta(x)) \enspace,\\
+        F_{r}  = c_{r} \cdot (m_v + m_p) \cdot g \cdot \cos(\theta(x)) \enspace,
+	\end{split}
+\end{equation}
+
+
+\noindent where $m_v$ is the mass of the vehicle, $m_p$ is the mass of the pilot, $m_r$ is mass equivalent to the moment of inertia of the rotating parts 
+(i.e., wheels and engine axle), $x$ is the position, $\varphi$ is the gear ratio, $F_{t}$ is the propulsive force, $i$ is the electric current in the motor, $F_{a}$ is the aerodynamic drag, $F_g$ is the component 
+of the weight that is the direction of speed, $F_{r}$ is the rolling resistance of tires on the track, and $\theta$ is the slope of the track. The model constants are shown in Tab. \ref{tab:constantes}.
+The experimental validation of this model has not been performed.
+
+\begin{figure}[h]
+	\centering
+	\begin{normalsize}
+		\import{2_Desenvolvimento/Figuras/}{diagrama_forcas_veiculo.pdf_tex}
+	\end{normalsize}
+	\caption{Diagram of forces of a moving vehicle}
+	\label{fig:diag_forcas_veiculo}
+\end{figure}
+
+\begin{table}[!h]
+	\centering
+    \caption{Constants used in the vehicle model}
+	\label{tab:constantes}
+	% \rowcolors{1}{}{lightgray}
+	\begin{tabular}{llll}
+		\toprule
+		\textbf{Constant} & \textbf{Symbol} & \textbf{Value} & \textbf{Unit}\\
+		\midrule
+		Vehicle mass                    & $m_v$  & 36               & \si{kg}                \\
+        Pilot mass		                & $m_p$  & 50               & \si{kg}                \\  
+        Number of wheels                & $N_r$  & 3                & -                      \\
+        Moment of inertia of the wheel  & $J_r$  & 0.015            & \si{kg.m^{2}}          \\
+        Moment of inertia of the motor  & $J_m$  & \num{0.0625d-3}  & \si{kg.m^{2}}          \\
+        Wheel radius                    & $r_r$  & 0.254            & \si{m}                 \\
+        Torque constant                 & $K_t$  & 0.119            & \si{N.m / A}           \\
+        Transmission efficiency         & $\eta$ & 0.95             & -                      \\
+        Air density                     & $\rho$ & 1.22             & \si{kg / m^{3}}        \\
+        Frontal area of the vehicle     & $a_f$  & 0.26             & \si{m^{2}}             \\
+        Aerodynamic drag coefficient    & $c_d$  & 0.164            & -                      \\
+        Gravity acceleration            & $g$    & 9.81             & \si{m / s^{2}}         \\
+        Rolling resistance coefficient  & $c_r$  & 0.0024           & -                      \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsection{Track modeling}
+
+In 2018 and 2019, SEM Americas was held at the Sonoma Raceway. 
+It is expected that the track will remain the same for the next editions of the competition. 
+\citet{site:dados_sonoma} made available GPS data collected on the Sonoma Raceway track in 2018. 
+This data were used for track modeling. The layout of one lap in Sonoma Raceway is shown in Fig.~\ref{fig:pista}, peaks of elevations are indicated with a triangle, valleys with a square. 
+
+The track’s relative altitude $h$ was approximated by a sum of sines with 8 terms
+\footnote{The fit was implemented in MATLAB using the command \lstinline[style=Matlab-editor]{fit(x, h, 'sin8')}}.  
+The approximation with trigonometric functions was chosen because of the periodicity of these functions. 
+In this way, it would be possible to represent all track laps in a continuous function. 
+Using continuous functions instead of interpolating values in tables reduces the computational cost.
+The slope model $\theta$ was obtained by deriving the altitude model with respect to $x$:
+\[ \theta(x) = arctg\left( \frac{\mathrm{d}h(x)}{\mathrm{d}x}  \right)  \]
+\begin{equation}
+	\label{eq:modeloTheta}
+	\theta(x) = \operatorname{arc\,tan} \left( \sum_{n = 1}^{8} a_n \cdot \cos(b_n \cdot x + c_n) \right)
+	\enspace,
+\end{equation}
+
+\noindent where the coefficients $a_n$, $b_n$ and $c_n$ are presented in Tab.~\ref{tab:coeficientes}. The fitted curve and the data are displays in Fig.~\ref{fig:altitude_pista}
+
+
+\begin{figure}[!h]
+    \centering
+    \begin{minipage}{.5\textwidth}
+        \centering
+        \input{2_Desenvolvimento/Figuras/pista.tex}
+        \caption{Layout of the racing track in Sonoma}
+        \label{fig:pista}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+        \centering
+
+        \input{2_Desenvolvimento/Figuras/altitude_pista2.tex}
+        \caption{Curve adjusted to represent track altitude}
+        \label{fig:altitude_pista}
+
+
+    \end{minipage}
+\end{figure}
+
+\begin{table}[!h]
+	\centering
+    \caption{Track's slope model coefficients}
+	\label{tab:coeficientes}
+	\begin{tabular}{crcrcrcr}
+		\toprule
+		\textbf{Coef.} & \textbf{Value} & \textbf{Coef.} & \textbf{Value} & \textbf{Coef.} & \textbf{Value} & \textbf{Coef.} & \textbf{Value}\\
+		\midrule
+        $a_1$   & 0.012293 & $a_3$   & 0.005818 & $a_5$   & 0.003958 & $a_7$   & 0.004361  \\
+        $b_1$   & 0.004363 & $b_3$   & 0.008726 & $b_5$   & 0.017449 & $b_7$   & 0.021814  \\
+        $c_1$   &-0.228758 & $c_3$   &-2.193381 & $c_5$   &-3.058604 & $c_7$   & 1.627015  \\
+        $a_2$   & 0.003041 & $a_4$   & 0.002926 & $a_6$   & 0.005365 & $a_8$   & 0.005539  \\
+        $b_2$   & 0.000236 & $b_4$   & 0.000246 & $b_6$   & 0.026184 & $b_8$   & 0.030552  \\
+        $c_2$   & 0.399758 & $c_4$   & 3.490690 & $c_6$   & 0.579933 & $c_8$   &-1.400496  \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{Formulation and solution of the optimal control problem}
+
+An optimal control problem aims to determine the parameters and control sequences of a system that will minimize a defined cost.
+Using the vehicle model in Eq.~(\ref{eq:modelo_1}), the track model in Eq.~(\ref{eq:modeloTheta}), and the SEM competition rules, the following formulation was used for the optimal control problem.
+
+\begin{mini!}
+	{i(t), \varphi, T}{\int_{0}^{T} i(t) \cdot \left(i(t) \cdot R_a + \frac{K_v \cdot \dot x(t) \cdot \varphi}{r_r} \right) \,\mathrm{d}t \label{eq:ObjOCP_final}}
+	{\label{eq:formulacaoOCP_final}}{}
+    \addConstraint{x(0) = \dot x(0)}{=0 \label{eq:C1_OCP_final}}{}
+    \addConstraint{\dot v(t) - \frac{F_t - (F_a + F_g + F_r)}{(m_v + m_p + m_r)}}{=0, \quad}{t \in \left[0,T\right]  \label{eq:C4_OCP_final}}
+	\addConstraint{i(t)-\frac{u_{bat}-K_v\cdot(\dot x(t) \cdot \varphi/r_r)}{R_a}}{\leq 0, \quad}{t \in \left[0,T\right]  \label{eq:C5_OCP_final}}
+    \addConstraint{0 \leq i(t)}{\leq i_{max}, \quad}{t \in \left[0,T\right]  \label{eq:C6_OCP_final}}
+    \addConstraint{0 \leq \dot x(t)}{\leq v_{max}, \quad}{t \in \left[0,T\right]  \label{eq:C7_OCP_final}}
+	\addConstraint{\varphi_{min}\leq \varphi}{ \leq \varphi_{max} \label{eq:C10_OCP_final}}{}
+    \addConstraint{x(T)}{= x_f \label{eq:C8_OCP_final}}{}
+    \addConstraint{T}{\leq t_{max}, \label{eq:C9_OCP_final}}{}
+\end{mini!}
+
+\noindent where 
+
+\begin{itemize}
+    \item[ ] Eq.~(\ref{eq:ObjOCP_final}) defines the electric energy consumed as the cost to minimize,
+    \item[ ] Eq.~(\ref{eq:C1_OCP_final}) is a constraint for the initial states of distance traveled and velocity null, 
+    \item[ ] Eq.~(\ref{eq:C4_OCP_final}) is a constraint  that ensure that the reset states respect the dynamics of the vehicle model, 
+    \item[ ] Eq.~(\ref{eq:C5_OCP_final}) is a path constraint to current due to the maximum battery voltage, 
+    \item[ ] Eq.~(\ref{eq:C6_OCP_final}) is a constraint for the maximum current, 
+    \item[ ] Eq.~(\ref{eq:C7_OCP_final}) is a constraint to the maximum car speed value set by the competition organization, 
+    \item[ ] Eq.~(\ref{eq:C10_OCP_final}) is the possible range for the gear ratio, 
+    \item[ ] Eq.~(\ref{eq:C8_OCP_final}) is a fixed end value constraint for the distance traveled, and 
+    \item[ ] Eq.~(\ref{eq:C9_OCP_final}) is a constraint to the maximum end time.
+  \end{itemize}
+
+% \noindent where the integral term of Eq.~(\ref{eq:ObjOCP_final}) defines the electric energy consumed as the cost to minimize, 
+% Eq.~(\ref{eq:C1_OCP_final}) is a constraint for the initial states of distance traveled and velocity null, 
+% Eq.~(\ref{eq:C4_OCP_final}) is a constraint  that ensure that the reset states respect the dynamics of the vehicle model, 
+% Eq.~(\ref{eq:C5_OCP_final}) is a path-to-current constraint due to the maximum battery voltage, 
+% Eq.~(\ref{eq:C6_OCP_final}) is a constraint for the maximum current value depending on the current limit delivered by the vehicle's power converter, 
+% Eq.~(\ref{eq:C7_OCP_final}) is a constraint to the maximum car speed value set by the competition organization, 
+% Eq.~(\ref{eq:C10_OCP_final}) is the possible range for the gear ratio, 
+% Eq.~(\ref{eq:C9_OCP_final}) is a constraint to the maximum end time value due to the minimum average speed limit determined by the competition organization ,and 
+% Eq.~(\ref{eq:C8_OCP_final}) is a fixed end value constraint for the distance traveled equivalent to seven laps on the track. 
+ 
+The constants in Eq.~(\ref{eq:formulacaoOCP_final}) are DT1 specifications and SEM rules. The constants values are shown in Tab.~\ref{tab:constantes_OCP}.
+The maximum time constant $t_{max}$ was determined utilizing a safety margin of \SI{3.68}{\percent} (\SI{51.52}{\second}) to satisfy the \SI{25.0}{km/h} of minimal average speed required on SEM rules. 
+This value of $t_{max}$ is equivalent to \SI{25.92}{km/h} of average speed.  
+The total distance constant $x_f$ was determined considering that the distance covered in a lap on the track is 1440 meters.
+
+\begin{table}[!h]
+    \centering
+    \caption{Constants of the proposed OCP}
+	\label{tab:constantes_OCP}
+    \begin{tabular}{lllll}
+    \toprule
+    \multicolumn{1}{l}{}                                                                    & \textbf{Constant} & \textbf{Symbol} & \textbf{Value} &  \textbf{Unit} \\ 
+    \midrule
+    \multirow{6}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{DT1} \\ \textbf{specs}\end{tabular}} & Battery voltage           & $u_{bat}$         & 42    & \si{V}     \\ % dt1
+                                                                                            & Maximum current           & $i_{max}$         & 30    & \si{A}     \\ % dt1
+                                                                                            & Maximum gear ratio        & $\varphi_{max}$   & 12.7  & -          \\ % dt1
+                                                                                            & Minimum gear ratio        & $\varphi_{min}$   & 5.08  & -          \\ 
+                                                                                            & Motor resistance          & $R_a$             & 0.07  & \si{\ohm}  \\
+                                                                                            & Induced voltage constant  & $K_v$             & 0.119 & \si{V/(\radian/s)}     \\
+
+    \midrule
+    \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}\textbf{SEM} \\ \textbf{rules}\end{tabular}} & Maximum speed           & $v_{max}$         & 12.5  & \si{m/s}   \\ % shell 
+                                                                                            & Maximum time            & $t_{max}$         & 1400  & \si{s}     \\ % shell
+                                                                                            & Total distance          & $x_f$             & 10080 & \si{m}     \\ 
+    \bottomrule
+    \end{tabular}
+    \end{table}
+
+FALCON.m is a free-use\footnote{The license can be requested at \url{https://www.fsd.lrg.tum.de/software/falcon-m}} software library for MATLAB, 
+developed at the Institute of Flight System Dynamics of the Technische Universit{\"a}t M{\"u}nchen to solve and analyze optimal control problems \citep{manual:Falcon}. 
+The OCP of Eq.~(\ref{eq:formulacaoOCP_final}) was solved using FALCON.m. The source code developed in this step was made using available open-source software.\footnote{Available for download at \url{https://github.com/michaelfsb/ocp_dt1}}
+
+In a direct current motor, the electric current is controlled through the applied voltage. 
+The electric current was chosen as the control variable instead of the voltage because the motor is decoupled from the transmission when it is off. 
+Decoupling the motor can only be represented by a discontinuous function, and this causes an increase in computational complexity in the OCP solution.
+The voltage required to produce the electrical current in the optimal case was calculated from the following equation
+
+\begin{equation}
+    u(t)=\begin{dcases*}
+      R_a \cdot i(t) + K_v \cdot \frac{x(t) \cdot \varphi}{r_r} , & \text{if $i(t)>0$},\\
+      0, & \text{otherwise}.
+    \end{dcases*}
+  \end{equation}

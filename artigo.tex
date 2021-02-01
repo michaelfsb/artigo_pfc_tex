@@ -1,0 +1,69 @@
+\documentclass[10pt,fleqn,a4paper,twoside]{article}
+\usepackage{abcm}
+\def\shortauthor{M. Barbosa, V. Campos e D. Dutra}
+\def\shorttitle{Optimal Control of Battery Electric Vehicle in Energy Efficiency Competitions}
+
+\usepackage[short]{optidef}
+
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usepackage[american]{circuitikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{tikz-qtree}
+
+\usepackage[framed, numbered]{matlab-prettifier}
+
+\usepackage[hidelinks]{hyperref}
+\urlstyle{same}
+
+\usepackage{import}
+
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{float}
+
+\begin{document}
+\fphead
+\hspace*{-2.5mm}\begin{tabular}{||p{\textwidth}}
+\begin{center}
+\vspace{-7mm}
+\title{OPTIMAL CONTROL OF BATTERY ELECTRIC VEHICLE IN ENERGY EFFICIENCY COMPETITIONS}
+\end{center}
+\authors{Michael Feliphe da Silva Barbosa, michaelfsb@ufmg.br$^{1}$} \\
+\authors{Víctor Costa da Silva Campos, victor@cpdee.ufmg.br$^{1}$} \\
+\authors{Dimas Abreu Archanjo Dutra, dimasad@ufmg.br$^{1}$} \\
+\\
+\institution{$^{1}$Universidade Federal de Minas Gerais Avenida Presidente Antônio Carlos, 6627 - Pampulha, Belo Horizonte – MG} \\
+\\
+\abstract{\textbf{Resumo.} Em competições de eficiência energética, como a Shell Eco-marathon (SEM), os veículos devem consumir a menor quantidade de energia em um trajeto fixo com tempo máximo determinado. Dois dos principais fatores que influenciam o consumo de energia de um veículo são a estratégia de direção e a relação de transmissão. O objeto deste estudo é defini-los de forma a minimizar o consumo de um protótipo elétrico para a SEM Americas 2019. A partir do modelo matemático desenvolvido para a dinâmica do veículo elétrico e das restrições da SEM foi proposto um problema de controle ótimo. Este problema foi solucionado computacionalmente. O consumo simulado para a estratégia ótima foi 3 vezes menor que o consumo na SEM Americas 2019. Sugerimos que não haja acionamento dos freios, que o tempo gasto seja o máximo permitido e que o motor seja ligado nos apenas nos trechos de aclive.}\\
+\\
+\keywords{\textbf{Palavras chave:} Shell Eco‐marathon, problema de controle ótimo, estrategia de direção, relação de transmissão.}\\
+\\
+\abstract{\textbf{Abstract.} In energy efficiency competitions, such as the Shell Eco-marathon (SEM), vehicles must consume the least amount of energy on a track which must be completed under a given time. Two significant factors influencing a vehicle’s energy consumption are the drive strategy and the gear ratio. This study aims to define these to minimize the consumption of a battery electric prototype in SEM Americas 2019. Based on the mathematical model developed for the electric vehicle dynamics and the restrictions of SEM, an optimal control problem was proposed. This problem was solved numerically. The simulated consumption for the optimal strategy was found to be three times lower than the consumption in SEM Americas 2019. Based on the results, we suggest no brake activation, that the time spent is the maximum allowed, and that the engine is connected only in uphill.}\\
+\\
+\keywords{\textbf{Keywords:} Shell eco-marathon, optimal control problem, driving strategy, gear ratio.}\\
+\end{tabular}
+
+\input{1_Introducao/introcucao}
+\input{2_Desenvolvimento/desenvolvimento}
+\input{3_Conclusao/conlusao}
+
+
+
+\section{ACKNOWLEDGEMENTS}
+We appreciate the Milhagem UFMG and Duke Electric Vehicles competition teams for providing the data used in the modeling. 
+Furthermore, we appreciate the Federal University of Minas Gerais for the academic license of MATLAB and the Institute of Flight System Dynamics of the Technical University of Munich for the license of FALCON.m toolbox.
+
+\section{REFERENCES} 
+
+\bibliographystyle{abcm}
+\renewcommand{\refname}{}
+\bibliography{bibfile}
+
+\section{RESPONSIBILITY FOR INFORMATION}
+
+The authors are solely responsible for the information included in this study.
+
+\end{document}

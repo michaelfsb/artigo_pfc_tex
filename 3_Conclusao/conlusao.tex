@@ -1,0 +1,137 @@
+\section{RESULTS}
+
+The solution found respected all the proposed restrictions and improve the autonomy to \SI{905.68}{km/kWh}.
+Optimized gear ratio $\varphi$ and end time parameters $T$ are indicated in Tab.~\ref{tab:resultadoOCP} along with the %autonomy, 
+media speed, and final speed metrics.
+The optimal driving strategy found was very similar to the strategy start-stop 
+in which the engine is turned off when the speed is maximum and reconnected only when it is minimal. 
+The world’s most fuel-efficient vehicle used a start-stop-like driving strategy when it set the world record at SEM Americas 2018 \citep{pp:Grady2019}. 
+However, in the optimal case, these values differed in the first, last, and other turns. 
+The time spent on each lap and the speed range are shown in Tab.~\ref{tab:laps}.
+The last lap is \SI{\approx 23}{s} slower than the other laps because it is not started at the end of it. 
+
+% \begin{table}[H]
+%     \centering 
+%         \caption{Optimized parameters and metrics for the optimal case}
+%         \label{tab:resultadoOCP}
+%         \begin{tabular}{lll}
+%             \toprule
+%             \textbf{Description} & \textbf{Value} & \textbf{Unit}\\
+%             \midrule
+%             Autonomy            & 905.68  & \si{km/kW.h}\\
+%             Gear ratio          & 9.2156  & -           \\
+%             Total time          & 1400.0  & \si{s}      \\  
+%             Average speed       & 25.92   & \si{km/h}   \\
+%             Final speed         & 17.09   & \si{km/h}   \\
+%             \bottomrule
+%         \end{tabular}    
+% \end{table}
+
+% \begin{table}[!h]
+%     \centering
+%     \caption{Time spent and speed limits on each lap for the optimal case}
+%     \label{tab:laps}
+%     \begin{tabular}{lccc}
+%         \toprule
+%         \textbf{Lap} & \begin{tabular}[c]{@{}c@{}}\textbf{Time} \\ \textbf{(\si{\second})}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Min. speed} \\ \textbf{(\si{\kilo\meter/\hour})}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Max. speed} \\ \textbf{(\si{\kilo\meter/\hour})}\end{tabular}\\
+%         \midrule
+%         1           & 203.0  & 17.3 & 26.8 \\
+%         2,3,5,6     & 194.6  & 17.3 & 35.0 \\
+%         4           & 196.0  & 17.3 & 35.0 \\  
+%         7           & 222.6  & 11.9 & 33.2 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+\begin{table}[!h]
+    \centering
+    \begin{minipage}[t]{.47\textwidth}
+        \centering 
+        \caption{Optimized parameters and metrics for the optimal case}
+        \label{tab:resultadoOCP}
+        \begin{tabular}{lll}
+            \toprule
+            \textbf{Description} & \textbf{Value} & \textbf{Unit}\\
+            \midrule
+            %Autonomy            & 905.68  & \si{km/kW.h}\\
+            Gear ratio          & 9.2156  & -           \\
+            Total time          & 1400.0  & \si{s}      \\  
+            Average speed       & 25.92   & \si{km/h}   \\
+            Final speed         & 17.09   & \si{km/h}   \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage} \hfill
+    \begin{minipage}[t]{.47\textwidth}
+        \centering
+        \caption{Time spent and speed limits on each lap for the optimal case}
+        \label{tab:laps}
+        \begin{tabular}{lccc}
+            \toprule
+            \textbf{Lap} & \begin{tabular}[c]{@{}c@{}}\textbf{Time} \\ \textbf{(\si{\second})}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Min. speed} \\ \textbf{(\si{\kilo\meter/\hour})}\end{tabular} & \begin{tabular}[c]{@{}c@{}}\textbf{Max. speed} \\ \textbf{(\si{\kilo\meter/\hour})}\end{tabular}\\
+            \midrule
+            1           & 203.0  & 17.3 & 26.8 \\
+            2,3,5,6     & 194.6  & 17.3 & 35.0 \\
+            4           & 196.0  & 17.3 & 35.0 \\  
+            7           & 222.6  & 11.9 & 33.2 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}
+  \end{table}
+
+
+Unlike common sense, the speed at the final instant was greater than zero, i.e., the vehicle has an amount of energy that will not be used. 
+This is due to the slow deceleration of the vehicle. More time would be spent on the last lap so that the final speed would be zero, and then the maximum time restriction would be violated.
+
+The graph in Fig.~\ref{graf:controle} presents the voltage that must be applied to the motor to produce the optimal control sequence's electrical current.
+The motor drives are smooth, the maximum voltage applied is below the battery voltage, and the electric current achieves \SI{30}{\ampere} only in the first part.
+The power applied to the motor does not exceed the value of \SI{194}{\watt}.
+
+\begin{figure}[H]
+    \centering
+    \input{3_Conclusao/Figuras/controle.tex}
+    \caption{Voltage $u$ and electric current $i$ in optimal case}
+    \label{graf:controle}
+\end{figure}
+
+Looking at Fig.~\ref{graf:resultadoOCP}, it is apparent that the motor is started only once per lap during the uphill stretch 
+(point F to point A in Fig.~\ref{fig:pista}) and remains off in the curves and downhill stretch in the optimal driving strategy.
+The periodic behavior of the altitude model can also be observed in this graph.
+
+\begin{figure}[H]
+    \centering
+    \input{3_Conclusao/Figuras/novo.tex}
+    \caption{Speed $\dot x$, propulsive force $F_p$ and, relative altitude $h$ in optimal case}
+    \label{graf:resultadoOCP}
+\end{figure}
+
+As Fig.~\ref{graf:resultadoForcas} shows, 
+the greatest resistive force that acted on the vehicle was the weight parallel component to the track $F_g$, ranging from \SI{-18.45}{\newton} to \SI{25.84}{\newton}. 
+Although $F_g$ is conservative and performs zero work in a closed circuit. It strongly influences, 
+given its magnitude compared to the other resistive forces, the prototype's accelerations, and, consequently, 
+the motor's working region. 
+The $F_a$ aerodynamic drag reached a maximum of \SI{2.46}{\newton}, and the $F_r$ rolling resistance had a constant value of \SI{2.02}{\newton}.
+
+\begin{figure}[H]
+    \centering
+    \input{3_Conclusao/Figuras/resultado_forcas.tex}
+    \caption{Aerodynamic drag $F_a$, rolling resistance $F_r$ and, weight component parallel to speed $F_g$ in optimal case}
+    \label{graf:resultadoForcas}
+\end{figure}
+
+
+\section{CONCLUSION}
+
+The current study's main goal was to determine the optimal driving strategy and transmission ratio for an electric battery vehicle in an energy efficiency competition.  
+This problem was addressed using optimal control theory. 
+Accordingly, a computational solution was proposed. 
+The optimal driving strategy and the gear ratio would bring the prototype's autonomy to \SI{905.7}{km/kWh}. 
+This autonomy is at least three times greater than the autonomy marks achieved. 
+
+The vehicle's model used has limitations due to the simplifications performed. The curve speed limit is one of these limitations because the lateral dynamics have not been modeled. 
+The studied vehicle has good stability in curves when compared to other vehicles of energy efficiency. 
+However, it is necessary to verify that it is possible to perform the curves with speed calculated in the optimal solution.
+
+Another important point regarding the vehicle model is that it has not been validated experimentally. 
+Therefore, it cannot state that the optimal response found is optimal for the real case.  
+Despite its limitations, the study certainly contributes to a qualitative compression of the efficient driving strategy for low-speed battery electric vehicles. 
+This work's natural progression is to validate the vehicle's model experimentally and implement the optimal case during the competition.
